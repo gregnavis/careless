@@ -1,0 +1,25 @@
+#!/bin/bash
+
+usage() {
+	echo "Usage: $0 rm file"
+    exit 2
+}
+
+careless_rm() {
+	export LD_LIBRARY_PATH="$(pwd):$LD_LIBRARY_PATH"
+	export LD_PRELOAD="libcareless.so"
+    export CARELESS_PATH="${HOME}/.careless"
+	exec rm $@
+}
+
+if [ -z $# ]; then
+	usage
+fi
+
+command=$1
+shift 1
+
+case "$command" in
+	"rm") careless_rm $@ ;;
+	*) usage ;;
+esac
