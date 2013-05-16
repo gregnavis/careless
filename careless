@@ -6,14 +6,20 @@ usage() {
     exit 2
 }
 
+fatal() {
+    echo "Error: $1"
+    exit 1
+}
+
 CARELESS_PATH="${HOME}/.careless"
+CARELESS_LOG="${CARELESS_PATH}/log"
 
 careless_rm() {
     CARELESS_ID="${BASHPID}.$(date +%s)"
     export CARELESS_OPERATION_PATH="${CARELESS_PATH}/${CARELESS_ID}"
 
     mkdir -p ${CARELESS_OPERATION_PATH}
-    echo ${CARELESS_ID} $(pwd) rm $@ >> ${CARELESS_PATH}/log
+    echo ${CARELESS_ID} $(pwd) rm $@ >> ${CARELESS_LOG}
 
     export LD_LIBRARY_PATH="$(pwd):$LD_LIBRARY_PATH"
     export LD_PRELOAD="libcareless.so"
@@ -21,7 +27,25 @@ careless_rm() {
 }
 
 careless_log() {
-    less ${CARELESS_PATH}/log
+    less ${CARELESS_LOG}
+}
+
+careless_revert() {
+    if [ $# -ne 1 ]; then
+        usage
+    fi
+
+    CARELESS_ID=$1
+
+    if ! egrep "^${CARELESS_ID} " ${CARELESS_LOG} >& /dev/null; then
+        fatal "unknown operation ${CARELESS_ID}"
+    fi
+
+    if [ ! -d "${CARELESS_PATH}/${CARELESS_ID}" ]; then
+        fatal "no data for operation ${CARELESS_ID}"
+    fi
+
+    cp -ri ${CARELESS_PATH}/${CARELESS_ID}/* /
 }
 
 if [ -z $# ]; then
@@ -34,5 +58,6 @@ shift 1
 case "$command" in
     "rm") careless_rm $@ ;;
     "log") careless_log ;;
+    "revert") careless_revert $@ ;;
     *) usage ;;
 esac
