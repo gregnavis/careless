@@ -1,25 +1,38 @@
 #!/bin/bash
 
 usage() {
-	echo "Usage: $0 rm file"
+    echo "Usage: $0 rm file"
+    echo "       $0 log"
     exit 2
 }
 
+CARELESS_PATH="${HOME}/.careless"
+
 careless_rm() {
-	export LD_LIBRARY_PATH="$(pwd):$LD_LIBRARY_PATH"
-	export LD_PRELOAD="libcareless.so"
-    export CARELESS_PATH="${HOME}/.careless"
-	exec rm $@
+    CARELESS_ID="${BASHPID}.$(date +%s)"
+    export CARELESS_OPERATION_PATH="${CARELESS_PATH}/${CARELESS_ID}"
+
+    mkdir -p ${CARELESS_OPERATION_PATH}
+    echo ${CARELESS_ID} $(pwd) rm $@ >> ${CARELESS_PATH}/log
+
+    export LD_LIBRARY_PATH="$(pwd):$LD_LIBRARY_PATH"
+    export LD_PRELOAD="libcareless.so"
+    exec rm $@
+}
+
+careless_log() {
+    less ${CARELESS_PATH}/log
 }
 
 if [ -z $# ]; then
-	usage
+    usage
 fi
 
 command=$1
 shift 1
 
 case "$command" in
-	"rm") careless_rm $@ ;;
-	*) usage ;;
+    "rm") careless_rm $@ ;;
+    "log") careless_log ;;
+    *) usage ;;
 esac

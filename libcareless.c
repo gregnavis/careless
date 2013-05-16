@@ -18,14 +18,14 @@ static void chop(char *, char);
 
 int unlinkat(int dirfd, const char *pathname, int flags)
 {
-	char *careless_path,
+	char *operation_path,
 		source_path[BUFFER_SIZE],
 		base_path[BUFFER_SIZE],
 		target_path[BUFFER_SIZE];
 
-	careless_path = getenv("CARELESS_PATH");
-	if (!careless_path) {
-		fprintf(stderr, "CARELESS_PATH is undefined\n");
+	operation_path = getenv("CARELESS_OPERATION_PATH");
+	if (!operation_path) {
+		fprintf(stderr, "CARELESS_OPERATION_PATH is undefined\n");
 		return -1;
 	}
 
@@ -38,10 +38,8 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 	fprintf(stderr, "source_path = %s\n", source_path);
 	snprintf(target_path,
 		sizeof(target_path),
-		"%s/%d.%d/%s",
-		careless_path,
-		getpid(),
-		time(NULL),
+		"%s/%s",
+		operation_path,
 		source_path);
 	fprintf(stderr, "target_path = %s\n", target_path);
 	basedir(target_path, base_path, sizeof(base_path));
