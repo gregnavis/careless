@@ -25,14 +25,14 @@ last careless operations by issuing
 
 ```
 careless log
-1 /home/directory rm -rf very_important_directory
+4883.1368714872 /home/directory rm -rf very_important_directory
 ```
 
 There are three columns: the ID of your careless action, the directory in which
 it took place and the action itself. In order to revert the action issue
 
 ```
-careless revert 1
+careless revert 4883.1368714872
 ```
 
 You'll find the deleted directory back in its place! If you want to revert the
@@ -54,3 +54,4 @@ Limitations
   `cp` and `mv`
 - only whole operation can be reverted, not individual files
 - the reverted files are placed in their original locations
+- `revert last` may throw an error when there are no operations logged
