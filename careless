@@ -37,6 +37,10 @@ careless_revert() {
 
     CARELESS_ID=$1
 
+    if [ "${CARELESS_ID}" == "last" ]; then
+        CARELESS_ID=$(tail -1 ${CARELESS_LOG} | cut -f1 -d\ )
+    fi
+
     if ! egrep "^${CARELESS_ID} " ${CARELESS_LOG} >& /dev/null; then
         fatal "unknown operation ${CARELESS_ID}"
     fi
