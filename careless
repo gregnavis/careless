@@ -30,6 +30,10 @@ careless_rm() {
 }
 
 careless_log() {
+    if [ ! -e "${CARELESS_LOG}" ]; then
+        return
+    fi
+
     less ${CARELESS_LOG}
 }
 
