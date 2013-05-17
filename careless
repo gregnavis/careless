@@ -1,8 +1,11 @@
 #!/bin/bash
 
+set -eu
+
 usage() {
     echo "Usage: $0 rm file"
     echo "       $0 log"
+    echo "       $0 revert <operation ID>"
     exit 2
 }
 
