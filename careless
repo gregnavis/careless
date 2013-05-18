@@ -21,8 +21,8 @@ careless_rm() {
     CARELESS_ID="${BASHPID}.$(date +%s)"
     export CARELESS_OPERATION_PATH="${CARELESS_PATH}/${CARELESS_ID}"
 
-    mkdir -p ${CARELESS_OPERATION_PATH}
-    echo ${CARELESS_ID} $(pwd) rm $@ >> ${CARELESS_LOG}
+    mkdir -p "${CARELESS_OPERATION_PATH}"
+    echo "${CARELESS_ID}" "$(pwd)" "rm $@" >> "${CARELESS_LOG}"
 
     export LD_LIBRARY_PATH="$(pwd):$LD_LIBRARY_PATH"
     export LD_PRELOAD="libcareless.so"
@@ -34,7 +34,7 @@ careless_log() {
         return
     fi
 
-    less ${CARELESS_LOG}
+    less "${CARELESS_LOG}"
 }
 
 careless_revert() {
@@ -42,13 +42,13 @@ careless_revert() {
         usage
     fi
 
-    CARELESS_ID=$1
+    CARELESS_ID="$1"
 
     if [ "${CARELESS_ID}" == "last" ]; then
-        CARELESS_ID=$(tail -1 ${CARELESS_LOG} | cut -f1 -d\ )
+        CARELESS_ID=$(tail -1 "${CARELESS_LOG}" | cut -f1 -d\ )
     fi
 
-    if ! egrep "^${CARELESS_ID} " ${CARELESS_LOG} >& /dev/null; then
+    if ! egrep "^${CARELESS_ID} " "${CARELESS_LOG}" >& /dev/null; then
         fatal "unknown operation ${CARELESS_ID}"
     fi
 
