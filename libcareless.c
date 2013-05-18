@@ -30,23 +30,19 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 	}
 
 	if (AT_FDCWD != dirfd) {
-		fprintf(stderr, "dirfd != AT_FDCWD\n");
+		fprintf(stderr, "dirfd != AT_FDCWD; "
+			"your version of rm may be unsupported\n");
 		return -1;
 	}
 
 	absolute_path(pathname, source_path, sizeof(source_path));
-	fprintf(stderr, "source_path = %s\n", source_path);
 	snprintf(target_path,
 		sizeof(target_path),
 		"%s/%s",
 		operation_path,
 		source_path);
-	fprintf(stderr, "target_path = %s\n", target_path);
 	basedir(target_path, base_path, sizeof(base_path));
-	fprintf(stderr, "base_path = %s\n", base_path);
 	mkdirp(base_path);
-
-	fprintf(stderr, "rename(%s, %s) = %d\n", source_path, target_path, rename(source_path, target_path));
 
 	return 0;
 }
