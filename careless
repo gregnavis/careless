@@ -45,7 +45,15 @@ careless_revert() {
     CARELESS_ID="$1"
 
     if [ "${CARELESS_ID}" == "last" ]; then
+        if [ ! -e "${CARELESS_LOG}" ]; then
+            fatal "no operation to revert"
+        fi
+
         CARELESS_ID=$(tail -1 "${CARELESS_LOG}" | cut -f1 -d\ )
+
+        if [ -z "${CARELESS_ID}" ]; then
+            fatal "no operation to revert"
+        fi
     fi
 
     if ! egrep "^${CARELESS_ID} " "${CARELESS_LOG}" >& /dev/null; then
@@ -59,7 +67,7 @@ careless_revert() {
     cp -ri ${CARELESS_PATH}/${CARELESS_ID}/* /
 }
 
-if [ -z $# ]; then
+if [ $# -eq 0 ]; then
     usage
 fi
 
