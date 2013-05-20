@@ -1,15 +1,28 @@
-Carelessnes is not a crime!
-===========================
+Careless (i.e. revertible) removals
+===================================
 
 Motivation
 ----------
 
 Have you ever been too careless when doing `rm`? Have you ever lost important
 data? You certainly have and even if you haven't then it's very likely that
-it'll soon happen to you!
+it'll soon happen to you! This program wraps `rm` so that all removals are
+revertible.
 
 The motto of the program is this: necessity is the mother of all invention
 (i.e. I've just deleted some pretty important files).
+
+Installation
+------------
+
+Just issue
+
+```
+make install
+```
+
+to install `/usr/bin/careless` and `/usr/lib/libcareless.so`. You are ready to
+use!
 
 Usage
 -----

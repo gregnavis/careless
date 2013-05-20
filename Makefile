@@ -1,8 +1,8 @@
 CC?=gcc
 OUTPUT=libcareless.so
 
-BIN_PATH?=/usr/bin
-LIB_PATH?=/usr/lib
+BIN_PATH=/usr/bin
+LIB_PATH=/usr/lib
 
 .PHONY: clean install
 .IGNORE: clean
@@ -14,7 +14,7 @@ $(OUTPUT): libcareless.c
 
 install: all
 	install -o root -g root -m 0755 $(OUTPUT) $(LIB_PATH)
-	install -o root -g root -m 0755 netredirect $(BIN_PATH)
+	install -o root -g root -m 0755 careless $(BIN_PATH)
 
 clean:
 	rm $(OUTPUT)
