@@ -7,18 +7,22 @@
 
 #include <fcntl.h>
 #include <time.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define BUFFER_SIZE 4096
 
 static void basedir(const char *, char *, size_t);
-static void absolute_path(const char *, char *, size_t);
+static void join_path(const char *, const char *, char *, size_t);
+static void fdpath(int, char *, size_t);
 static void mkdirp(const char *);
 static void chop(char *, char);
+static int is_dir(const char *);
 
 int unlinkat(int dirfd, const char *pathname, int flags)
 {
 	char *operation_path,
+		root_path[BUFFER_SIZE],
 		source_path[BUFFER_SIZE],
 		base_path[BUFFER_SIZE],
 		target_path[BUFFER_SIZE];
@@ -29,13 +33,16 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 		return -1;
 	}
 
-	if (AT_FDCWD != dirfd) {
-		fprintf(stderr, "dirfd != AT_FDCWD; "
-			"your version of rm may be unsupported\n");
-		return -1;
+	if (*pathname == '/') {
+		strncpy(source_path, pathname, sizeof(source_path));
+	} else if (AT_FDCWD == dirfd) {
+		getcwd(root_path, sizeof(root_path));
+		join_path(root_path, pathname, source_path, sizeof(source_path));
+	} else {
+		fdpath(dirfd, root_path, sizeof(root_path));
+		join_path(root_path, pathname, source_path, sizeof(source_path));
 	}
 
-	absolute_path(pathname, source_path, sizeof(source_path));
 	snprintf(target_path,
 		sizeof(target_path),
 		"%s/%s",
@@ -43,6 +50,16 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 		source_path);
 	basedir(target_path, base_path, sizeof(base_path));
 	mkdirp(base_path);
+
+	if (!is_dir(source_path) || !is_dir(target_path)) {
+		fprintf(stderr,
+			"rename(%s, %s) = %d\n",
+			source_path,
+			target_path,
+			rename(source_path, target_path));
+	} else {
+		rmdir(source_path);
+	}
 
 	return 0;
 }
@@ -71,12 +88,17 @@ out:
 	return;
 }
 
-static void absolute_path(const char *relative_path, char *output, size_t size)
+static void join_path(const char *path1, const char *path2, char *output, size_t size)
 {
-	char current_directory[BUFFER_SIZE];
+	snprintf(output, size, "%s/%s", path1, path2);
+}
 
-	getcwd(current_directory, sizeof(current_directory));
-	snprintf(output, size, "%s/%s", current_directory, relative_path);
+static void fdpath(int fd, char *output, size_t size)
+{
+	char path[BUFFER_SIZE];
+
+	snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
+	readlink(path, output, size);
 }
 
 /* A lazy implementation of mkdir -p ;-) */
@@ -93,4 +115,15 @@ static void chop(char *string, char to_remove)
 	if (to_remove == string[length]) {
 		string[length] = '\0';
 	}
+}
+
+static int is_dir(const char *path)
+{
+	struct stat stat_;
+
+	if (-1 == stat(path, &stat_)) {
+		return 0;
+	}
+
+	return S_ISDIR(stat_.st_mode);
 }
