@@ -1,8 +1,8 @@
 CC?=gcc
 OUTPUT=libcareless.so
 
-BIN_PATH=/usr/bin
-LIB_PATH=/usr/lib
+BIN_PATH=/usr/local/bin
+LIB_PATH=/usr/local/lib
 
 .PHONY: clean install
 .IGNORE: clean

@@ -24,7 +24,7 @@ careless_rm() {
     mkdir -p "${CARELESS_OPERATION_PATH}"
     echo "${CARELESS_ID}" "$(pwd)" "rm $@" >> "${CARELESS_LOG}"
 
-    export LD_PRELOAD="/usr/lib/libcareless.so"
+    export LD_PRELOAD="/usr/local/lib/libcareless.so"
     exec rm $@
 }
 
