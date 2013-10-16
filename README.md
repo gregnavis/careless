@@ -67,5 +67,4 @@ Limitations
   `cp` and `mv`
 - only whole operation can be reverted, not individual files
 - the reverted files are placed in their original locations
-- `revert last` may throw an error when there are no operations logged
 - support only the partition that contains the home directory
