@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include <fcntl.h>
 #include <time.h>
@@ -52,11 +53,15 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 	mkdirp(base_path);
 
 	if (!is_dir(source_path) || !is_dir(target_path)) {
+		int rename_result = rename(source_path, target_path);
+		int rename_errno = errno;
+
 		fprintf(stderr,
-			"rename(%s, %s) = %d\n",
+			"rename(%s, %s) = %d, %s\n",
 			source_path,
 			target_path,
-			rename(source_path, target_path));
+			rename_result,
+			strerror(rename_errno));
 	} else {
 		rmdir(source_path);
 	}
