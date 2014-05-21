@@ -56,12 +56,14 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 		int rename_result = rename(source_path, target_path);
 		int rename_errno = errno;
 
-		fprintf(stderr,
-			"rename(%s, %s) = %d, %s\n",
-			source_path,
-			target_path,
-			rename_result,
-			strerror(rename_errno));
+		if (rename_errno) {
+			fprintf(stderr,
+				"careless error: rename(%s, %s) = %d, %s\n",
+				source_path,
+				target_path,
+				rename_result,
+				strerror(rename_errno));
+		}
 	} else {
 		rmdir(source_path);
 	}
