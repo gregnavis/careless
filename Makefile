@@ -10,7 +10,7 @@ LIB_PATH=/usr/local/lib
 all: $(OUTPUT)
 
 $(OUTPUT): libcareless.c
-	$(CC) -shared -fPIC $^ -ldl -o $@
+	$(CC) -Werror -Wall -Wextra -pedantic -ansi -shared -fPIC $^ -ldl -o $@
 
 install: all
 	install -o root -g root -m 0755 $(OUTPUT) $(LIB_PATH)

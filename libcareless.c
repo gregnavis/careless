@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 
@@ -11,7 +12,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 4*4096
+
+#define unused(argument) ((void) argument)
 
 static void basedir(const char *, char *, size_t);
 static void join_path(const char *, const char *, char *, size_t);
@@ -19,6 +22,8 @@ static void fdpath(int, char *, size_t);
 static void mkdirp(const char *);
 static void chop(char *, char);
 static int is_dir(const char *);
+static void move(const char *, const char *);
+static void run(const char *, ...);
 
 int unlinkat(int dirfd, const char *pathname, int flags)
 {
@@ -27,6 +32,8 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 		source_path[BUFFER_SIZE],
 		base_path[BUFFER_SIZE],
 		target_path[BUFFER_SIZE];
+
+	unused(flags);
 
 	operation_path = getenv("CARELESS_OPERATION_PATH");
 	if (!operation_path) {
@@ -53,17 +60,7 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 	mkdirp(base_path);
 
 	if (!is_dir(source_path) || !is_dir(target_path)) {
-		int rename_result = rename(source_path, target_path);
-		int rename_errno = errno;
-
-		if (rename_errno) {
-			fprintf(stderr,
-				"careless error: rename(%s, %s) = %d, %s\n",
-				source_path,
-				target_path,
-				rename_result,
-				strerror(rename_errno));
-		}
+		move(source_path, target_path);
 	} else {
 		rmdir(source_path);
 	}
@@ -111,9 +108,7 @@ static void fdpath(int fd, char *output, size_t size)
 /* A lazy implementation of mkdir -p ;-) */
 static void mkdirp(const char *path)
 {
-	char command[BUFFER_SIZE];
-	sprintf(command, "mkdir -p %s", path);
-	system(command);
+	run("mkdir -p \"%s\"", path);
 }
 
 static void chop(char *string, char to_remove)
@@ -133,4 +128,19 @@ static int is_dir(const char *path)
 	}
 
 	return S_ISDIR(stat_.st_mode);
+}
+
+static void move(const char *source_path, const char *target_path)
+{
+	run("mv \"%s\" \"%s\"", source_path, target_path);
+}
+
+static void run(const char *command_format, ...)
+{
+	va_list args;
+	char command[BUFFER_SIZE];
+
+	va_start(args, command_format);
+	vsnprintf(command, sizeof(command), command_format, args);
+	va_end(args);
 }
