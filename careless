@@ -3,10 +3,28 @@
 set -eu
 
 usage() {
-    echo "Usage: $0 rm file"
-    echo "       $0 log"
-    echo "       $0 revert <operation ID>"
-    echo "       $0 clear"
+    echo "USAGE"
+    echo
+    echo "run rm with th given arguments:"
+    echo
+    echo "  $0 rm <arguments>"
+    echo
+    echo "show the transaction log:"
+    echo
+    echo "  $0 log"
+    echo
+    echo "revert the last operation:"
+    echo
+    echo "  $0 revert last"
+    echo
+    echo "revert a particular operation:"
+    echo
+    echo "  $0 revert <operation ID>"
+    echo
+    echo "permanently clear the transactions:"
+    echo
+    echo "  $0 clear"
+    echo
     exit 2
 }
 
